@@ -1,15 +1,14 @@
-FROM trafex/php-nginx:latest
+FROM php:8.2-apache
 
-# Cambia al directorio de trabajo
-WORKDIR /var/www/html
+# Cambiar el puerto de Apache internamente al 10000 (el que Render quiere)
+RUN sed -i 's/Listen 80/Listen 10000/g' /etc/apache2/ports.conf \
+    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:10000>/g' /etc/apache2/sites-available/000-default.conf
 
-# Copia tus archivos
-COPY --chown=nginx:nginx . /var/www/html
+# Copiar tus archivos al directorio web
+COPY . /var/www/html/
 
-# Configuramos el puerto 10000 tanto para Nginx como para Render
-ENV PORT=10000
+# Asegurar permisos correctos para que carguen todas las imágenes y logos
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
 EXPOSE 10000
-
-# Modificamos internamente la configuración de Nginx para que escuche en el puerto 10000
-RUN sed -i 's/listen \[::\]:8080 default_server;/listen [::]:10000 default_server;/g' /etc/nginx/conf.d/default.conf \
-    && sed -i 's/listen 8080 default_server;/listen 10000 default_server;/g' /etc/nginx/conf.d/default.conf
