@@ -1,7 +1,10 @@
 FROM php:8.2-apache
 
-# Copia todos los archivos de tu repositorio al directorio web del servidor
+# Copia los archivos del proyecto
 COPY . /var/www/html/
 
-# Expone el puerto 80 para el tráfico web
+# Asegura que Apache sea el dueño de los archivos y pueda leerlos correctamente
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
 EXPOSE 80
