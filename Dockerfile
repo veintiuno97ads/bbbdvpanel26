@@ -1,10 +1,10 @@
-FROM php:8.2-apache
+FROM trafex/php-nginx:latest
 
-# Copia los archivos del proyecto
-COPY . /var/www/html/
+# Cambia al directorio de trabajo por defecto de Nginx
+WORKDIR /var/www/html
 
-# Asegura que Apache sea el dueño de los archivos y pueda leerlos correctamente
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Copia todos tus archivos al servidor
+COPY --chown=nginx:nginx . /var/www/html
 
-EXPOSE 80
+# El puerto por defecto que usa este contenedor ligero es el 8080
+EXPOSE 8080
